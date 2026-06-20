@@ -7,6 +7,6 @@
   "exports": { ".": "./src/index.ts" },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types \"src/**/*.test.ts\""
+    "test": "tsx --test \"src/**/*.test.ts\""
   }
 }
