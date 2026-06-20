@@ -16,7 +16,11 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   const ka = Object.keys(a as object);
   const kb = Object.keys(b as object);
   if (ka.length !== kb.length) return false;
-  return ka.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
+  return ka.every(
+    (k) =>
+      Object.prototype.hasOwnProperty.call(b, k) &&
+      deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]),
+  );
 }
 
 const TOKEN = /\{\{\s*([\w.]+)\s*\}\}/g;

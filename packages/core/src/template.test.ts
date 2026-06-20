@@ -21,6 +21,8 @@ test("deepEqual compares primitives, arrays, objects", () => {
   assert.equal(deepEqual({ a: [1, 2] }, { a: [1, 2] }), true);
   assert.equal(deepEqual({ a: 1 }, { a: 2 }), false);
   assert.equal(deepEqual([1], [1, 2]), false);
+  assert.equal(deepEqual({ x: undefined }, { y: 1 }), false);
+  assert.equal(deepEqual({ a: 1 }, { a: 1, b: 2 }), false);
 });
 
 test("interpolate substitutes resolved values", () => {
