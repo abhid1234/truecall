@@ -6,7 +6,7 @@
 
 **Architecture:** Pure, harness-neutral library. A `Contract` (per `docs/spec.md`) is validated, then `runContract(contract, ctx)` evaluates its check(s) — built-ins (`file_exists`, `http`, `shell`, `result`) or a custom `verify` fn — under a timeout, fail-closed, and produces a `VerifyResult`. `wrapTool(contract, toolFn)` composes a tool with its contract so the tool's success is gated by the post-condition. No harness-specific code lives here (adapters are Phase 3).
 
-**Tech Stack:** TypeScript 5.9 (type-check only, `tsc --noEmit`), Node 22 with `--experimental-strip-types` to run `.ts` directly, built-in `node:test` + `node:assert` for tests, global `fetch`, `node:fs/promises`, `node:child_process`. **Zero runtime and dev dependencies.**
+**Tech Stack:** TypeScript 5.9 (type-check only, `tsc --noEmit`), Node 22 + `tsx` (from the symlinked `~/.local/node_modules`) to run `.ts` tests directly — this Node build is compiled WITHOUT TypeScript support, so `--experimental-strip-types` fails with `ERR_NO_TYPESCRIPT`; `tsx` is the offline-safe substitute. Built-in `node:test` + `node:assert` for tests, global `fetch`, `node:fs/promises`, `node:child_process`. **Zero runtime and dev dependencies in `package.json`** (`tsx`/`tsc`/`@types/node` come from the symlink, never an install).
 
 ## Global Constraints
 
@@ -15,7 +15,7 @@ Copied verbatim from `docs/spec.md` and `CLAUDE.md` — every task's requirement
 - **Zero-dependency.** `package.json` has NO `dependencies` and NO `devDependencies`. The locked-down build environment blocks external npm (403). `tsc` and `@types/node` come from the symlinked `~/.local/node_modules`, never an `npm install` in the repo.
 - **Deterministic only.** No LLM-judge check type. A custom `verify` must check state, never call a model. (LLM fallback is v2.)
 - **Cross-harness neutral.** `packages/core` imports nothing harness-specific (no Claude Code / Codex / Antigravity references). Adapters are Phase 3.
-- **Node:** ≥ 22.6 (uses `--experimental-strip-types`). Local toolchain confirmed: Node v22.22.2, tsc 5.9.3.
+- **Node:** v22.22.2 (confirmed). This build is compiled WITHOUT TypeScript support — `node --experimental-strip-types` fails (`ERR_NO_TYPESCRIPT`). Run `.ts` tests with `tsx` (v4.21.0, present in `~/.local/node_modules`). Type-check with `tsc` 5.9.3 (on PATH).
 - **Fail-closed:** a verifier that cannot produce a verdict (throw, missing template path, timeout) returns `{ ok: false, error: true, ... }` — never a pass.
 - **License:** MIT.
 - **Spec is normative:** field names, check types, and `VerifyResult` shape must match `docs/spec.md §10` exactly.
@@ -42,7 +42,7 @@ packages/core/
 └── src/wrap.ts             # wrapTool() — compose tool + contract (acceptance deliverable)
 ```
 
-Run all tests from `packages/core/`: `node --test --experimental-strip-types "src/**/*.test.ts"`
+Run all tests from `packages/core/`: `./node_modules/.bin/tsx --test "src/**/*.test.ts"`
 Type-check from `packages/core/`: `tsc --noEmit`
 
 ---
@@ -73,7 +73,7 @@ Type-check from `packages/core/`: `tsc --noEmit`
   "exports": { ".": "./src/index.ts" },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types \"src/**/*.test.ts\""
+    "test": "./node_modules/.bin/tsx --test \"src/**/*.test.ts\""
   }
 }
 ```
@@ -195,7 +195,7 @@ test("interpolate throws TemplateError on missing path (fail-closed)", () => {
 
 - [ ] **Step 6: Run the test, verify it fails**
 
-Run (from `packages/core/`): `node --test --experimental-strip-types src/template.test.ts`
+Run (from `packages/core/`): `./node_modules/.bin/tsx --test src/template.test.ts`
 Expected: FAIL — `Cannot find module './template.ts'`.
 
 - [ ] **Step 7: Implement the utilities**
@@ -220,7 +220,11 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   const ka = Object.keys(a as object);
   const kb = Object.keys(b as object);
   if (ka.length !== kb.length) return false;
-  return ka.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
+  return ka.every(
+    (k) =>
+      Object.prototype.hasOwnProperty.call(b, k) &&
+      deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]),
+  );
 }
 
 const TOKEN = /\{\{\s*([\w.]+)\s*\}\}/g;
@@ -238,7 +242,7 @@ export function interpolate(tmpl: string, ctx: Ctx, transform: (v: string) => st
 
 - [ ] **Step 8: Run the test, verify it passes**
 
-Run: `node --test --experimental-strip-types src/template.test.ts`
+Run: `./node_modules/.bin/tsx --test src/template.test.ts`
 Expected: PASS (5 tests).
 
 - [ ] **Step 9: Type-check**
@@ -318,7 +322,7 @@ test("contract() returns the contract when valid", () => {
 
 - [ ] **Step 2: Run the test, verify it fails**
 
-Run: `node --test --experimental-strip-types src/contract.test.ts`
+Run: `./node_modules/.bin/tsx --test src/contract.test.ts`
 Expected: FAIL — `Cannot find module './contract.ts'`.
 
 - [ ] **Step 3: Implement validation + builder**
@@ -381,7 +385,7 @@ export function contract(c: Contract): Contract {
 
 - [ ] **Step 4: Run the test, verify it passes**
 
-Run: `node --test --experimental-strip-types src/contract.test.ts`
+Run: `./node_modules/.bin/tsx --test src/contract.test.ts`
 Expected: PASS (7 tests).
 
 - [ ] **Step 5: Type-check and commit**
@@ -513,7 +517,7 @@ test("custom verify throw propagates (verifier error)", async () => {
 
 - [ ] **Step 2: Run the test, verify it fails**
 
-Run: `node --test --experimental-strip-types src/checks.test.ts`
+Run: `./node_modules/.bin/tsx --test src/checks.test.ts`
 Expected: FAIL — `Cannot find module './checks.ts'`.
 
 - [ ] **Step 3: Implement the checks**
@@ -653,7 +657,7 @@ async function shellCheck(
 
 - [ ] **Step 4: Run the test, verify it passes**
 
-Run: `node --test --experimental-strip-types src/checks.test.ts`
+Run: `./node_modules/.bin/tsx --test src/checks.test.ts`
 Expected: PASS (8 tests).
 
 - [ ] **Step 5: Type-check and commit**
@@ -743,7 +747,7 @@ test("timeout is fail-closed with error:true", async () => {
 
 - [ ] **Step 2: Run the test, verify it fails**
 
-Run: `node --test --experimental-strip-types src/verify.test.ts`
+Run: `./node_modules/.bin/tsx --test src/verify.test.ts`
 Expected: FAIL — `Cannot find module './verify.ts'`.
 
 - [ ] **Step 3: Implement the orchestrator**
@@ -803,7 +807,7 @@ function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 
 - [ ] **Step 4: Run the test, verify it passes**
 
-Run: `node --test --experimental-strip-types src/verify.test.ts`
+Run: `./node_modules/.bin/tsx --test src/verify.test.ts`
 Expected: PASS (5 tests).
 
 - [ ] **Step 5: Type-check and commit**
@@ -888,7 +892,7 @@ test("index re-exports the public API", async () => {
 
 - [ ] **Step 2: Run the test, verify it fails**
 
-Run: `node --test --experimental-strip-types src/wrap.test.ts`
+Run: `./node_modules/.bin/tsx --test src/wrap.test.ts`
 Expected: FAIL — `Cannot find module './wrap.ts'`.
 
 - [ ] **Step 3: Implement wrapTool**
@@ -930,7 +934,7 @@ export type { Tmpl, Ctx, Check, Contract, VerifyResult } from "./types.ts";
 
 - [ ] **Step 5: Run the test, verify it passes**
 
-Run: `node --test --experimental-strip-types src/wrap.test.ts`
+Run: `./node_modules/.bin/tsx --test src/wrap.test.ts`
 Expected: PASS (3 tests). The middle test is the Phase 2 acceptance proof.
 
 - [ ] **Step 6: Run the full suite + type-check**
@@ -938,7 +942,7 @@ Expected: PASS (3 tests). The middle test is the Phase 2 acceptance proof.
 Run (from `packages/core/`):
 ```bash
 tsc --noEmit
-node --test --experimental-strip-types "src/**/*.test.ts"
+./node_modules/.bin/tsx --test "src/**/*.test.ts"
 ```
 Expected: type-check clean; all tests pass across template/contract/checks/verify/wrap (28 tests total).
 
