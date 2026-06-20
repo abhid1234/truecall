@@ -6,3 +6,6 @@ build/
 *.log
 .DS_Store
 .wrangler/
+
+# SDD scratch (ledger, briefs, review packages)
+.superpowers/
