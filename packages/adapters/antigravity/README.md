@@ -1,6 +1,6 @@
 # @truecall/adapter-antigravity (not yet available)
 
-**Status: blocked on a public API.** As of this writing, Google Antigravity exposes no documented
+**Status: blocked on a public API.** As of this writing, Antigravity exposes no documented
 post-tool-execution hook or lifecycle-callback mechanism that an external integration can use to inspect a
 tool call's result and feed a correction back to the agent (the equivalent of Claude Code's / Codex's
 `PostToolUse` hook). Antigravity is currently invite-oriented with undocumented integration surfaces, so a
