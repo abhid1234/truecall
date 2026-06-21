@@ -4,47 +4,10 @@ import { handleHookEvent, type HookInput } from "./hook.ts";
 import { loadBindings, type Binding } from "./registry.ts";
 
 async function readStdin(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const chunks: string[] = [];
-    let resolved = false;
-    let dataReceived = false;
-
-    process.stdin.setEncoding("utf8");
-
-    // If stdin is not a TTY and no data is available immediately, wait a bit
-    // But if we get data, resolve as soon as we detect the pattern or timeout
-    const initialTimer = setTimeout(() => {
-      if (!resolved) {
-        if (dataReceived) {
-          resolved = true;
-          resolve(chunks.join(""));
-        }
-      }
-    }, 50);
-
-    process.stdin.on("data", (chunk) => {
-      if (!resolved) {
-        dataReceived = true;
-        chunks.push(typeof chunk === "string" ? chunk : chunk.toString());
-      }
-    });
-
-    process.stdin.on("end", () => {
-      if (!resolved) {
-        resolved = true;
-        clearTimeout(initialTimer);
-        resolve(chunks.join(""));
-      }
-    });
-
-    process.stdin.on("error", (err) => {
-      if (!resolved) {
-        resolved = true;
-        clearTimeout(initialTimer);
-        reject(err);
-      }
-    });
-  });
+  process.stdin.setEncoding("utf8");
+  let data = "";
+  for await (const chunk of process.stdin) data += chunk;
+  return data;
 }
 
 async function main(): Promise<void> {

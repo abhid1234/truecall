@@ -51,3 +51,11 @@ test("bin emits nothing when no contract matches", async () => {
   const out = await runBin({ tool_name: "unmatched", tool_input: {}, tool_output: {} }, FAIL_CONTRACTS);
   assert.equal(out, "");
 });
+
+test("bin is a no-op (does NOT block) when the contracts module is missing", async () => {
+  const out = await spawnBin(
+    { tool_name: "demo", tool_input: {}, tool_output: { ok: false } },
+    { ...process.env, TRUECALL_CONTRACTS: "/nonexistent/truecall.contracts.js" },
+  );
+  assert.equal(out, "");
+});
