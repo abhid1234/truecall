@@ -343,8 +343,9 @@ Verifies that an **OpenAI Codex CLI** tool call achieved its real-world intent, 
 **PostToolUse hook**. When a tool reports success but a TrueCall contract's post-condition fails, the hook
 returns a `decision:"block"` correction so the agent self-corrects instead of trusting the false success.
 
-This adapter shares its entire verifier with the Claude Code adapter (`@truecall/adapter-core`) — the same
-`truecall.contracts.js` format works in both. Only the install config differs.
+This adapter and the Claude Code adapter both delegate to the same harness-neutral verifier
+(`@truecall/adapter-core`), so the identical `truecall.contracts.js` format works in both — only the install
+config differs.
 
 ## 1. Declare contracts
 
@@ -417,7 +418,7 @@ Replace the entire contents of `packages/adapters/antigravity/README.md` with:
 ````markdown
 # @truecall/adapter-antigravity (not yet available)
 
-**Status: blocked on a public API.** As of this writing, Google Antigravity exposes no documented
+**Status: blocked on a public API.** As of this writing, Antigravity exposes no documented
 post-tool-execution hook or lifecycle-callback mechanism that an external integration can use to inspect a
 tool call's result and feed a correction back to the agent (the equivalent of Claude Code's / Codex's
 `PostToolUse` hook). Antigravity is currently invite-oriented with undocumented integration surfaces, so a
