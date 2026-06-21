@@ -14,5 +14,11 @@ enabled, the lie is caught and Claude is told to correct it.
    contract in `truecall.contracts.js`, finds no `notes/note1.md`, and returns a `decision:"block"`
    correction. Claude sees the post-condition failed and self-corrects (e.g. writes the note itself).
 
+> **Note on working directory.** Both the hook's default contracts-module lookup (`./truecall.contracts.js`)
+> and the contract's relative note path (`notes/<id>.md`) resolve against the hook process's current
+> directory, which Claude Code sets to the opened project root — so open *this* folder as the project.
+> If your setup differs, point the hook at an absolute contracts module via the `TRUECALL_CONTRACTS`
+> environment variable.
+
 See `../../../docs/demo-claude-code.md` for the full narrative and `../../../docs/demo-video-script.md`
 for the 30-second script.
