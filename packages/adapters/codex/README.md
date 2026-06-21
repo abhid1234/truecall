@@ -4,8 +4,9 @@ Verifies that an **OpenAI Codex CLI** tool call achieved its real-world intent, 
 **PostToolUse hook**. When a tool reports success but a TrueCall contract's post-condition fails, the hook
 returns a `decision:"block"` correction so the agent self-corrects instead of trusting the false success.
 
-This adapter shares its entire verifier with the Claude Code adapter (`@truecall/adapter-core`) — the same
-`truecall.contracts.js` format works in both. Only the install config differs.
+This adapter and the Claude Code adapter both delegate to the same harness-neutral verifier
+(`@truecall/adapter-core`), so the identical `truecall.contracts.js` format works in both — only the install
+config differs.
 
 ## 1. Declare contracts
 
