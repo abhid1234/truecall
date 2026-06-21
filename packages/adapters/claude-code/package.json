@@ -1,0 +1,12 @@
+{
+  "name": "@truecall/adapter-claude-code",
+  "version": "0.0.1",
+  "description": "Claude Code PostToolUse adapter for TrueCall — verifies tool calls achieved their intent.",
+  "license": "MIT",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  }
+}
