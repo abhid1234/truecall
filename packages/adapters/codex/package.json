@@ -1,0 +1,12 @@
+{
+  "name": "@truecall/adapter-codex",
+  "version": "0.0.1",
+  "description": "OpenAI Codex CLI PostToolUse adapter for TrueCall — verifies tool calls achieved their intent.",
+  "license": "MIT",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  }
+}

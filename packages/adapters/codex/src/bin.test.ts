@@ -22,13 +22,14 @@ function spawnBin(input: object, env: NodeJS.ProcessEnv): Promise<string> {
   });
 }
 
-test("claude-code delegate bin emits block JSON on a failing post-condition", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "tc-cc-"));
+test("codex delegate bin emits block JSON on a failing post-condition (uses tool_response)", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tc-codex-"));
   const mod = join(dir, "contracts.mjs");
   await writeFile(mod, `export default [{ contract: { tool: "demo", post: { check: "result", path: "ok", equals: true } } }];`);
   try {
     const out = await spawnBin(
-      { tool_name: "demo", tool_input: {}, tool_output: { ok: false } },
+      // Codex delivers the result under `tool_response`; the shared handler reads tool_output ?? tool_response.
+      { tool_name: "demo", tool_input: {}, tool_response: { ok: false } },
       { ...process.env, TRUECALL_CONTRACTS: mod },
     );
     assert.equal(JSON.parse(out).decision, "block");
