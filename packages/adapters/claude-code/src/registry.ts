@@ -9,7 +9,7 @@ export async function loadBindings(moduleUrl: string): Promise<Binding[]> {
   } catch (e) {
     throw new Error(`TrueCall: could not load contracts module "${moduleUrl}": ${(e as Error).message}`);
   }
-  const raw = (mod.default ?? mod.bindings ?? mod.contracts) as unknown;
+  const raw = mod.default as unknown;
   if (!Array.isArray(raw)) {
     throw new Error(
       `TrueCall: contracts module "${moduleUrl}" must default-export an array of bindings or contracts`,
