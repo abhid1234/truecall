@@ -6,3 +6,10 @@ build/
 *.log
 .DS_Store
 .wrangler/
+
+# SDD scratch (ledger, briefs, review packages)
+.superpowers/
+
+# Local operator seeds (project context; not for the public repo)
+CLAUDE.md
+AGENTS.md

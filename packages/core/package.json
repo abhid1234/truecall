@@ -1,0 +1,12 @@
+{
+  "name": "@truecall/core",
+  "version": "0.0.1",
+  "description": "Deterministic runtime post-condition verification for AI agent tool calls.",
+  "license": "MIT",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  }
+}
