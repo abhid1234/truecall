@@ -10,8 +10,6 @@ const here = fileURLToPath(new URL(".", import.meta.url));
 const tsx = join(here, "..", "node_modules", ".bin", "tsx");
 const bin = join(here, "bin.ts");
 
-// Run bin.ts as a subprocess, piping the hook JSON to its stdin.
-// (execFile has no `input` option — stdin must be written explicitly, or bin.ts hangs.)
 function spawnBin(input: object, env: NodeJS.ProcessEnv): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(tsx, [bin], { env });
@@ -24,38 +22,17 @@ function spawnBin(input: object, env: NodeJS.ProcessEnv): Promise<string> {
   });
 }
 
-async function runBin(input: object, contractsSource: string) {
-  const dir = await mkdtemp(join(tmpdir(), "tc-bin-"));
+test("claude-code delegate bin emits block JSON on a failing post-condition", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tc-cc-"));
   const mod = join(dir, "contracts.mjs");
-  await writeFile(mod, contractsSource);
+  await writeFile(mod, `export default [{ contract: { tool: "demo", post: { check: "result", path: "ok", equals: true } } }];`);
   try {
-    return await spawnBin(input, { ...process.env, TRUECALL_CONTRACTS: mod });
+    const out = await spawnBin(
+      { tool_name: "demo", tool_input: {}, tool_output: { ok: false } },
+      { ...process.env, TRUECALL_CONTRACTS: mod },
+    );
+    assert.equal(JSON.parse(out).decision, "block");
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
-}
-
-const FAIL_CONTRACTS = `export default [{ contract: { tool: "demo", post: { check: "result", path: "ok", equals: true } } }];`;
-
-test("bin emits block JSON on a failing post-condition", async () => {
-  const out = await runBin({ tool_name: "demo", tool_input: {}, tool_output: { ok: false } }, FAIL_CONTRACTS);
-  assert.equal(JSON.parse(out).decision, "block");
-});
-
-test("bin emits nothing on a passing post-condition", async () => {
-  const out = await runBin({ tool_name: "demo", tool_input: {}, tool_output: { ok: true } }, FAIL_CONTRACTS);
-  assert.equal(out, "");
-});
-
-test("bin emits nothing when no contract matches", async () => {
-  const out = await runBin({ tool_name: "unmatched", tool_input: {}, tool_output: {} }, FAIL_CONTRACTS);
-  assert.equal(out, "");
-});
-
-test("bin is a no-op (does NOT block) when the contracts module is missing", async () => {
-  const out = await spawnBin(
-    { tool_name: "demo", tool_input: {}, tool_output: { ok: false } },
-    { ...process.env, TRUECALL_CONTRACTS: "/nonexistent/truecall.contracts.js" },
-  );
-  assert.equal(out, "");
 });

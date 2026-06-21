@@ -1,0 +1,12 @@
+{
+  "name": "@truecall/adapter-core",
+  "version": "0.0.1",
+  "description": "Harness-neutral PostToolUse verifier core for TrueCall adapters.",
+  "license": "MIT",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"src/**/*.test.ts\""
+  }
+}

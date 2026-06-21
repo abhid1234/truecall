@@ -1,4 +1,2 @@
-export { handleHookEvent } from "./hook.ts";
-export type { HookInput } from "./hook.ts";
-export { loadBindings } from "./registry.ts";
-export type { Binding } from "./registry.ts";
+export { handleHookEvent, loadBindings } from "../../shared/src/index.ts";
+export type { Binding, HookInput } from "../../shared/src/index.ts";
