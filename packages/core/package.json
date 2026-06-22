@@ -1,5 +1,5 @@
 {
-  "name": "@truecall/core",
+  "name": "truecall",
   "version": "0.1.0",
   "description": "Deterministic runtime post-condition verification for AI agent tool calls.",
   "license": "MIT",
@@ -44,5 +44,9 @@
     "test": "tsx --test \"src/**/*.test.ts\"",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   }
 }
