@@ -13,46 +13,95 @@
 </head>
 <body>
 <header class="masthead">
-  <div class="brand">TrueCall <span class="brand-sub">Playground</span></div>
-  <div class="tagline">Your agent says "done." Did it? Run the verifier in your browser.</div>
-  <div class="links">
-    <span class="badge" title="file/shell/http checks run against a mock world in your browser">simulated environment</span>
-    <a href="https://github.com/abhid1234/truecall" target="_blank" rel="noopener">GitHub</a>
-    <a href="https://github.com/abhid1234/truecall/blob/main/docs/spec.md" target="_blank" rel="noopener">Spec</a>
+  <div class="mast-top">
+    <div class="brand">TrueCall <span class="brand-sub">Playground</span></div>
+    <div class="tagline">Your agent says "done." Did it? Run the verifier in your browser.</div>
+    <div class="links">
+      <span class="badge" title="file/shell/http checks run against a mock world in your browser">simulated environment</span>
+      <a href="https://github.com/abhid1234/truecall" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/abhid1234/truecall/blob/main/docs/spec.md" target="_blank" rel="noopener">Spec</a>
+    </div>
+  </div>
+  <div class="metrics">
+    <span class="chip-m">deterministic</span>
+    <span class="chip-m">cross-harness</span>
+    <span class="chip-m">5 checks</span>
+    <span class="chip-m">fail-closed</span>
+    <span class="chip-m count" id="caught">silent failures caught: 0</span>
+    <span class="chip-m streak" id="streak" hidden></span>
   </div>
 </header>
+
 <main>
   <aside class="rail">
-    <div class="rail-title">Scenarios</div>
+    <input id="search" class="search" type="search" placeholder="Search scenarios…" autocomplete="off" />
+    <div id="chips" class="chips"></div>
     <ul id="scenario-list"></ul>
+    <button id="challenge" class="challenge-btn">🎯 Challenge me</button>
     <p class="rail-note">Pick a scenario, flip <b>silently failed</b>, then Run TrueCall.</p>
   </aside>
+
   <section class="stage">
+    <div id="challenge-bar" class="challenge-bar" hidden>
+      <span id="challenge-q">Will TrueCall <b>pass</b> or <b>catch</b> this?</span>
+      <button id="guess-pass" class="guess">It passes</button>
+      <button id="guess-catch" class="guess">It catches it</button>
+      <button id="challenge-next" class="guess next" hidden>Next →</button>
+      <button id="challenge-exit" class="ghost">exit</button>
+    </div>
+
     <div class="panel">
       <div class="panel-h">1 · The tool call</div>
-      <div id="call" class="mono"></div>
+      <pre id="call" class="mono code"></pre>
     </div>
-    <div class="panel">
+
+    <div class="panel" id="world-panel">
       <div class="panel-h">2 · The world <span class="panel-hint">(simulated)</span></div>
       <div class="toggle-row">
         <label class="switch"><input type="checkbox" id="bug-toggle" /><span class="slider"></span></label>
         <span id="bug-label" class="toggle-label"></span>
       </div>
-      <div id="world" class="mono dim"></div>
+      <pre id="world" class="mono code dim"></pre>
     </div>
+
     <div class="panel">
       <div class="panel-h">3 · The contract <button id="edit-btn" class="ghost">edit</button></div>
-      <div id="contract" class="mono"></div>
+      <pre id="contract" class="mono code"></pre>
       <textarea id="contract-editor" class="editor" spellcheck="false" hidden></textarea>
       <div id="editor-note" class="editor-note" hidden>Editing the contract JSON. <code>verify</code> functions are kept from the scenario.</div>
     </div>
-    <button id="run" class="run">▶ Run TrueCall</button>
+
+    <div class="run-row">
+      <button id="run" class="run">▶ Run TrueCall</button>
+      <button id="play" class="ctl" hidden>play</button>
+      <button id="step" class="ctl" hidden>step</button>
+      <button id="replay" class="ctl" hidden>replay</button>
+    </div>
+
     <div class="panel console-panel">
-      <div class="panel-h">Result</div>
-      <pre id="console" class="console">Pick a scenario and press Run.</pre>
+      <div class="panel-h">Verification timeline</div>
+      <div id="console" class="console"><span class="dim">Pick a scenario and press Run.</span></div>
+    </div>
+
+    <div class="panel" id="diff-panel" hidden>
+      <div class="panel-h">Without TrueCall · With TrueCall</div>
+      <div id="diff" class="diff"></div>
     </div>
   </section>
 </main>
+
+<div id="intro" class="intro" hidden>
+  <div class="intro-card">
+    <div class="intro-h">Your agent says "done." Did it?</div>
+    <p>Agents call a tool, get <code>{"status":"success"}</code>, and move on — even when the file was never
+       written or the record never saved. TrueCall runs a cheap <b>deterministic</b> post-condition that
+       confirms the tool actually changed the world, and hands the agent a correction when it didn't.</p>
+    <p class="intro-sub">This playground runs the real verifier in your browser against a simulated environment.
+       Flip <b>silently failed</b> on any scenario and watch it get caught.</p>
+    <button id="intro-go" class="run">Try the first scenario →</button>
+  </div>
+</div>
+
 <script type="module" src="app.js"></script>
 </body>
 </html>
