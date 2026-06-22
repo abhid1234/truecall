@@ -9,7 +9,7 @@ TrueCall on the *same* tasks and the *same* fault seed.
 | File | Role | Tested without a key? |
 |---|---|---|
 | `truecall.py` | dependency-free Python port of the verify semantics (deterministic, fail-closed) | ✅ `tests/` |
-| `contracts.py` | **generic, developer-authored** post-conditions (`db_changed` for any WRITE tool; richer per-tool examples) | ✅ `tests/` |
+| `contracts.py` | **generic, developer-authored** post-conditions (`db_changed` for any WRITE tool; richer per-tool examples) — covers **retail, airline, telecom** | ✅ `tests/` |
 | `faults.py` | seeded fault injector (WRITE tools "succeed" but skip the mutation) | ✅ `tests/` |
 | `seam.py` | monkeypatch of `Environment.get_response` → snapshot db, (inject fault), verify, correct in-flight | needs a run |
 | `sitecustomize.py` | auto-installs the seam into the `tau2 run` process via env config | needs a run |

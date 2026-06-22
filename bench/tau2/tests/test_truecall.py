@@ -49,6 +49,21 @@ class TestVerifier(unittest.TestCase):
         self.assertTrue(run_contract(c, good).ok)
         self.assertFalse(run_contract(c, bad).ok)
 
+    def test_airline_cancel_reservation_contract(self):
+        c = SPECIFIC["cancel_reservation"]
+        # a db with a `reservations` collection (airline)
+        class ResDB:
+            def __init__(self, status): self.reservations = {"R1": FakeOrder(status)}
+            def model_dump(self): return {"reservations": {k: v.model_dump() for k, v in self.reservations.items()}}
+        good = Ctx(tool="cancel_reservation", args={"reservation_id": "R1"}, result={}, after=ResDB("cancelled"))
+        bad = Ctx(tool="cancel_reservation", args={"reservation_id": "R1"}, result={}, after=ResDB(None))
+        self.assertTrue(run_contract(c, good).ok)
+        self.assertFalse(run_contract(c, bad).ok)
+
+    def test_multi_domain_write_routing(self):
+        for wt in ("book_reservation", "suspend_line", "refuel_data", "modify_pending_order_items"):
+            self.assertEqual(contract_for(wt, is_write=True).describe, "the write actually changed the database")
+
     def test_fail_closed_on_verifier_exception(self):
         def boom(ctx):
             raise RuntimeError("kaboom")

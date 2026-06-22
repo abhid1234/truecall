@@ -20,8 +20,14 @@ WRITE_TOOLS = {
         "modify_pending_order_payment", "modify_user_address", "return_delivered_order_items",
         "exchange_delivered_order_items",
     },
-    # airline/telecom: fill from each domain's @is_tool(ToolType.WRITE) methods, or set
-    # TRUECALL_AUTODETECT=1 to derive at runtime (see below).
+    "airline": {
+        "book_reservation", "cancel_reservation", "send_certificate",
+        "update_reservation_baggages", "update_reservation_flights", "update_reservation_passengers",
+    },
+    "telecom": {
+        "suspend_line", "resume_line", "send_payment_request",
+        "enable_roaming", "disable_roaming", "refuel_data",
+    },
 }
 
 
