@@ -49,7 +49,10 @@ ESM module, no imports, browser + Node compatible. Mirrors `docs/spec.md`:
 - `getPath(obj, path)`, `deepEqual(a,b)`, `interpolate(tmpl, ctx, transform?)` — ported from `template.ts`.
 - `runCheck(check, ctx, world)`:
   - `result` → real (operates on `ctx.result`).
-  - `verify` → real (runs the predicate; in the editor, user JS via `new Function`, sandboxed client-side).
+  - `verify` → real (runs the predicate). For safety the editor does NOT eval user JS: the contract is
+    edited as JSON (`JSON.parse`, never `eval`/`new Function`), and any `verify` function is re-attached
+    from the curated scenario via a `"<fn:kept-from-scenario>"` sentinel — so user text can never
+    introduce executable code.
   - `file_exists` → simulated against `world.files` (`{ [path]: { size, content } }`).
   - `http` → simulated against `world.http` (`{ [url]: { status, body } }`).
   - `shell` → simulated against `world.shell` (`{ [cmd]: { exitCode, stdout } }`).

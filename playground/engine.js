@@ -53,7 +53,7 @@ export async function runCheck(check, ctx, world = {}) {
 function fileExists(c, ctx, world) {
   const path = interpolate(c.path, ctx);
   const expected = `file at ${path}` +
-    (c.minSize !== undefined ? ` (size >= ${c.minSize})` : "") +
+    (c.minSize !== undefined ? ` with size >= ${c.minSize}` : "") +
     (c.contains !== undefined ? ` containing "${c.contains}"` : "");
   const f = (world.files || {})[path];
   if (!f) return { passed: false, expected, actual: `no file exists at ${path}` };
@@ -96,12 +96,12 @@ function shellCheck(c, ctx, world) {
   const wantExit = c.exitCode ?? (c.stdoutMatches !== undefined ? undefined : 0);
   const expected = "`" + cmd + "`" +
     (wantExit !== undefined ? ` exits ${wantExit}` : "") +
-    (c.stdoutMatches !== undefined ? ` stdout ~ /${c.stdoutMatches}/` : "");
+    (c.stdoutMatches !== undefined ? ` stdout matches /${c.stdoutMatches}/` : "");
   const r = (world.shell || {})[cmd] || { exitCode: 127, stdout: "" };
   if (wantExit !== undefined && r.exitCode !== wantExit)
     return { passed: false, expected, actual: `exit ${r.exitCode}` };
   if (c.stdoutMatches !== undefined && !new RegExp(c.stdoutMatches).test(r.stdout))
-    return { passed: false, expected, actual: "stdout did not match" };
+    return { passed: false, expected, actual: `stdout did not match (got: ${JSON.stringify(r.stdout)})` };
   return { passed: true, expected, actual: `exit ${r.exitCode}` };
 }
 
