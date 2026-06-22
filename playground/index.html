@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TrueCall Playground — does your agent's tool call actually do the thing?</title>
+<meta name="description" content="Run TrueCall's deterministic post-condition verifier in your browser and watch it catch a silent tool failure." />
+<link rel="icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="masthead">
+  <div class="brand">TrueCall <span class="brand-sub">Playground</span></div>
+  <div class="tagline">Your agent says "done." Did it? Run the verifier in your browser.</div>
+  <div class="links">
+    <span class="badge" title="file/shell/http checks run against a mock world in your browser">simulated environment</span>
+    <a href="https://github.com/abhid1234/truecall" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/abhid1234/truecall/blob/main/docs/spec.md" target="_blank" rel="noopener">Spec</a>
+  </div>
+</header>
+<main>
+  <aside class="rail">
+    <div class="rail-title">Scenarios</div>
+    <ul id="scenario-list"></ul>
+    <p class="rail-note">Pick a scenario, flip <b>silently failed</b>, then Run TrueCall.</p>
+  </aside>
+  <section class="stage">
+    <div class="panel">
+      <div class="panel-h">1 · The tool call</div>
+      <div id="call" class="mono"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">2 · The world <span class="panel-hint">(simulated)</span></div>
+      <div class="toggle-row">
+        <label class="switch"><input type="checkbox" id="bug-toggle" /><span class="slider"></span></label>
+        <span id="bug-label" class="toggle-label"></span>
+      </div>
+      <div id="world" class="mono dim"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">3 · The contract <button id="edit-btn" class="ghost">edit</button></div>
+      <div id="contract" class="mono"></div>
+      <textarea id="contract-editor" class="editor" spellcheck="false" hidden></textarea>
+      <div id="editor-note" class="editor-note" hidden>Editing the contract JSON. <code>verify</code> functions are kept from the scenario.</div>
+    </div>
+    <button id="run" class="run">▶ Run TrueCall</button>
+    <div class="panel console-panel">
+      <div class="panel-h">Result</div>
+      <pre id="console" class="console">Pick a scenario and press Run.</pre>
+    </div>
+  </section>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
