@@ -6,4 +6,5 @@ export { wrapTool } from "./wrap.ts";
 export type { WrappedResult, WrapOptions } from "./wrap.ts";
 export { verifyWithRetry } from "./retry.ts";
 export type { RetryOutcome, AttemptFn, CorrectionSignal } from "./retry.ts";
+export { recipes, fromSchema } from "./recipes.ts";
 export type { Tmpl, Ctx, Check, Contract, VerifyResult, SchemaType } from "./types.ts";
