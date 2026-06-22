@@ -1,7 +1,7 @@
 import { stat, readFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { Check, Ctx } from "./types.ts";
+import type { Check, Ctx, SchemaType } from "./types.ts";
 import { interpolate, getPath, deepEqual } from "./template.ts";
 
 const pexecFile = promisify(execFile);
@@ -22,7 +22,39 @@ export async function runCheck(chk: Check, ctx: Ctx): Promise<CheckOutcome> {
     case "http": return httpCheck(chk, ctx);
     case "shell": return shellCheck(chk, ctx);
     case "result": return resultCheck(chk, ctx);
+    case "schema": return schemaCheck(chk, ctx);
   }
+}
+
+function typeOf(v: unknown): SchemaType | "null" | "undefined" {
+  if (v === null) return "null";
+  if (v === undefined) return "undefined";
+  if (Array.isArray(v)) return "array";
+  const t = typeof v;
+  if (t === "string" || t === "number" || t === "boolean" || t === "object") return t;
+  return "object";
+}
+
+function schemaCheck(
+  chk: { path?: string; shape: Record<string, SchemaType> },
+  ctx: Ctx,
+): CheckOutcome {
+  const root = chk.path ? getPath(ctx.result, chk.path) : ctx.result;
+  const where = chk.path ? `result.${chk.path}` : "result";
+  const expected = `${where} matches shape { ${Object.entries(chk.shape).map(([k, t]) => `${k}: ${t}`).join(", ")} }`;
+  if (root === null || typeof root !== "object") {
+    return { passed: false, expected, actual: `${where} is ${typeOf(root)}, not an object` };
+  }
+  for (const [key, want] of Object.entries(chk.shape)) {
+    const val = (root as Record<string, unknown>)[key];
+    const got = typeOf(val);
+    if (want === "present") {
+      if (val === undefined || val === null) return { passed: false, expected, actual: `${where}.${key} is ${got}` };
+    } else if (got !== want) {
+      return { passed: false, expected, actual: `${where}.${key} is ${got}, expected ${want}` };
+    }
+  }
+  return { passed: true, expected, actual: `${where} matches the shape` };
 }
 
 async function fileExists(

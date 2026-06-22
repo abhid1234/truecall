@@ -98,10 +98,20 @@ real-intent verification; use `result` as a supporting check.
 - `exists` (optional) — assert the path is present (and not `null`/`undefined`).
 - `equals` (optional) — assert the value at the path deep-equals this.
 
-### 2.5 `verify` — custom escape hatch
+### 2.5 `schema` — shape of the tool's payload
+Asserts the result (or `result.<path>`) is an object whose fields match expected JS types — a quick
+structural sanity check on what the tool returned. Like `result`, it checks the payload's *shape*, not
+that the world changed; use it as a supporting check.
+- `path` (optional) — dotted path into the result; omit to check the result object itself.
+- `shape` (required) — `{ [field]: "string" | "number" | "boolean" | "object" | "array" | "present" }`.
+  `"present"` means any non-null value.
+
+### 2.6 `verify` — custom escape hatch
 An async predicate. Receives the full [context](#4-templates-and-context) and returns `true` (passed)
 or `false` (failed). Use this whenever the built-ins can't express the post-condition (database row
-exists, queue depth changed, third-party SDK lookup, …).
+exists, queue depth changed, third-party SDK lookup, …). The context includes `ctx.before` (a
+pre-execution snapshot, when captured — see §9) so a `verify` can express a **delta** ("row count
+increased by 1").
 - `verify` (required) — `(ctx: Ctx) => boolean | Promise<boolean>`.
 - `describe` (required when used) — a short phrase describing the post-condition; populates the
   correction signal's `expected` field (the runtime can't infer it from arbitrary code).
@@ -293,10 +303,12 @@ In scope: the four built-in checks, the custom escape hatch, templates, the corr
 fail-closed verifier-error semantics — all deterministic, all harness-neutral.
 
 Explicitly **deferred**:
-- **Pre-snapshot / delta checks** ("row count increased by 1") — v1 is post-state only. A custom
-  `verify` can capture state itself, but there is no first-class pre-hook.
+- **Pre-snapshot / delta checks** ("row count increased by 1") — now supported: `wrapTool(contract, tool,
+  { snapshot })` captures a pre-execution snapshot exposed to a custom `verify` as `ctx.before`. (There is
+  still no *declarative* delta check type; express the comparison in a `verify`.)
 - **Retry / self-correction policy in the format** — the contract emits a signal; the adapter owns the
-  retry loop (Phase 3).
+  retry loop. A core helper, `verifyWithRetry(contract, attempt, { maxRetries })`, is now provided for
+  programmatic use (catch → re-attempt with the correction fed back → re-verify → stop after N).
 - **LLM-judge check type** — see [§3](#3-determinism-boundary-a-hard-rule); deterministic only in v1.
 - **Auto-generating contracts from tool schemas** — v2; v1 is hand-written.
 - **`OR` combinator** — express disjunction in a custom `verify`.

@@ -16,6 +16,14 @@ State-of-the-art tool-using agents fail more often than their `success` response
 
 The fix works: a verification layer has been shown to cut agent failure rates by up to ~50% on τ²-bench. TrueCall is an **open and deterministic** take on that layer.
 
+## Does it work?
+
+A small reproducible benchmark ([`bench/`](bench)) of the mechanism — a *seeded* silent-failure distribution, **not** τ-bench:
+
+> **Without TrueCall: ~48% of tasks silently shipped broken. With TrueCall: 100% completed — every silent failure caught and corrected, 0 false positives.**
+
+`cd bench && tsx run.ts` to reproduce (same seed → same numbers). It's an honest test of the *mechanism* (deterministic catch + the [`verifyWithRetry`](packages/core/src/retry.ts) self-correction loop), not a claim about real agent task mixes — a live-agent τ-bench run is the natural next step.
+
 ## The wedge
 
 TrueCall is the combination that nothing else is, all at once:
@@ -61,9 +69,12 @@ When a tool returns `{ status: "success" }` but never wrote the file, `r.ok` is 
 - `http` — re-fetch a resource and assert status / a JSON field (the canonical "returned 200 but nothing changed" catch)
 - `shell` — run a read-only probe, assert exit code / stdout
 - `result` — assert on the tool's own returned payload
-- `verify` — a custom async predicate for anything the built-ins don't cover
+- `schema` — assert the result's shape (field types / presence)
+- `verify` — a custom async predicate for anything the built-ins don't cover (gets `ctx.before`, a pre-snapshot, for delta checks like "row count +1")
 
 Verification is **deterministic by design** — there is no LLM-judge check type. If a verifier can't produce a verdict (throws, a template path is missing, or it times out), TrueCall is **fail-closed**: it reports "could not verify," never a silent pass.
+
+**Less boilerplate:** `verifyWithRetry(contract, attempt, { maxRetries })` runs the catch→correct→re-verify loop for you; `recipes.*` and `fromSchema(tool, schema)` generate starter contracts so you don't hand-write every post-condition.
 
 See [`docs/spec.md`](docs/spec.md) for the full contract format.
 

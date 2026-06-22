@@ -97,3 +97,19 @@ test("custom verify is dispatched and uses describe", async () => {
 test("custom verify throw propagates (verifier error)", async () => {
   await assert.rejects(() => runCheck({ verify: () => { throw new Error("boom"); }, describe: "x" }, ctxWith({})));
 });
+
+test("schema asserts the result's shape (types + presence)", async () => {
+  const ctx = ctxWith({}, { id: "x1", count: 3, tags: ["a"], meta: { k: 1 } });
+  assert.equal((await runCheck({ check: "schema", shape: { id: "string", count: "number", tags: "array", meta: "object" } }, ctx)).passed, true);
+  assert.equal((await runCheck({ check: "schema", shape: { id: "string", count: "string" } }, ctx)).passed, false);
+  assert.equal((await runCheck({ check: "schema", shape: { missing: "present" } }, ctx)).passed, false);
+  const sub = ctxWith({}, { data: { ok: true } });
+  assert.equal((await runCheck({ check: "schema", path: "data", shape: { ok: "boolean" } }, sub)).passed, true);
+  assert.equal((await runCheck({ check: "schema", shape: { x: "number" } }, ctxWith({}, "nope"))).passed, false);
+});
+
+test("delta: a custom verify can compare ctx.before to ctx.result", async () => {
+  const ctx: Ctx = { tool: "t", args: {}, result: { count: 5 }, before: { count: 4 } };
+  const grew = await runCheck({ verify: (c) => (c.result as { count: number }).count > (c.before as { count: number }).count, describe: "count increased" }, ctx);
+  assert.equal(grew.passed, true);
+});
