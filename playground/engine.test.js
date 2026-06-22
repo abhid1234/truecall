@@ -28,3 +28,10 @@ test("missing template path is fail-closed", async () => {
   assert.equal(r.ok, false);
   assert.equal(r.error, true);
 });
+
+test("composite AND: deploy_build catches when the shell check fails", async () => {
+  const s = SCENARIOS.find((x) => x.id === "deploy_build");
+  const r = await runContract(s.contract, s.call, s.worlds.bug);
+  assert.equal(r.ok, false);
+  assert.match(r.actual, /exit 1/);
+});
