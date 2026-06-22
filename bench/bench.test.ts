@@ -24,3 +24,11 @@ test("reproducible: same seed → same metrics", async () => {
   const b = await runBench({ seed: 7, trials: 100 });
   assert.deepEqual(a, b);
 });
+
+test("headline numbers (the figures quoted in the READMEs) are pinned", async () => {
+  // guards the public claim — if the bench changes, this forces the docs to be updated
+  const m = await runBench(); // defaults: seed 12345, trials 240, p 0.5
+  assert.equal(m.withoutSuccessPct, 51.7);
+  assert.equal(m.withSuccessPct, 100);
+  assert.equal(m.avgAttempts, 1.48);
+});
