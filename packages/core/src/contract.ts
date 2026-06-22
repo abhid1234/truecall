@@ -1,6 +1,6 @@
 import type { Contract, Check } from "./types.ts";
 
-const BUILTIN = new Set(["file_exists", "http", "shell", "result"]);
+const BUILTIN = new Set(["file_exists", "http", "shell", "result", "schema"]);
 
 export function validateContract(c: Contract): string[] {
   const errs: string[] = [];
@@ -42,6 +42,9 @@ function validateCheck(chk: Check, i: number): string[] {
   if (t === "http" && typeof anyChk.url !== "string") e.push(`${p}.url is required`);
   if (t === "shell" && typeof anyChk.cmd !== "string") e.push(`${p}.cmd is required`);
   if (t === "result" && typeof anyChk.path !== "string") e.push(`${p}.path is required`);
+  if (t === "schema" && (typeof anyChk.shape !== "object" || anyChk.shape === null || Array.isArray(anyChk.shape))) {
+    e.push(`${p}.shape (an object of field -> type) is required`);
+  }
   return e;
 }
 

@@ -40,7 +40,28 @@ test("SILENT FAILURE: tool returns success but writes nothing => ok:false + sign
 
 test("index re-exports the public API", async () => {
   const api = await import("./index.ts");
-  for (const name of ["contract", "validateContract", "runContract", "runCheck", "wrapTool"]) {
+  for (const name of ["contract", "validateContract", "runContract", "runCheck", "wrapTool", "verifyWithRetry"]) {
     assert.equal(typeof (api as Record<string, unknown>)[name], "function", `${name} exported`);
   }
+});
+
+test("snapshot captures ctx.before for a delta post-condition", async () => {
+  const store = { rows: 1 };
+  // tool adds a row; the contract verifies the count actually increased vs. the pre-snapshot
+  const addRow = wrapTool(
+    contract({ tool: "add_row", post: { verify: (ctx) => store.rows > (ctx.before as { rows: number }).rows, describe: "row count increased" } }),
+    async () => { store.rows += 1; return { status: "success" }; },
+    { snapshot: () => ({ rows: store.rows }) },
+  );
+  const ok = await addRow({});
+  assert.equal(ok.ok, true);
+
+  // a tool that lies (no row added) is caught, because before == after
+  const noop = wrapTool(
+    contract({ tool: "add_row", post: { verify: (ctx) => store.rows > (ctx.before as { rows: number }).rows, describe: "row count increased" } }),
+    async () => ({ status: "success" }),
+    { snapshot: () => ({ rows: store.rows }) },
+  );
+  const caught = await noop({});
+  assert.equal(caught.ok, false);
 });
