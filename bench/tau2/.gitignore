@@ -1,0 +1,6 @@
+# tau2-bench is cloned + installed here by setup.sh (heavy, MIT — not vendored)
+.tau2/
+.venv/
+__pycache__/
+*.pyc
+results/
