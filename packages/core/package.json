@@ -1,12 +1,48 @@
 {
   "name": "@truecall/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Deterministic runtime post-condition verification for AI agent tool calls.",
   "license": "MIT",
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhid1234/truecall.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/abhid1234/truecall#readme",
+  "bugs": {
+    "url": "https://github.com/abhid1234/truecall/issues"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "tool-use",
+    "verification",
+    "post-condition",
+    "llm",
+    "reliability",
+    "mcp",
+    "claude-code",
+    "codex"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test \"src/**/*.test.ts\""
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build"
   }
 }
