@@ -296,7 +296,8 @@ Explicitly **deferred**:
 - **Pre-snapshot / delta checks** ("row count increased by 1") — v1 is post-state only. A custom
   `verify` can capture state itself, but there is no first-class pre-hook.
 - **Retry / self-correction policy in the format** — the contract emits a signal; the adapter owns the
-  retry loop (Phase 3).
+  retry loop. A core helper, `verifyWithRetry(contract, attempt, { maxRetries })`, is now provided for
+  programmatic use (catch → re-attempt with the correction fed back → re-verify → stop after N).
 - **LLM-judge check type** — see [§3](#3-determinism-boundary-a-hard-rule); deterministic only in v1.
 - **Auto-generating contracts from tool schemas** — v2; v1 is hand-written.
 - **`OR` combinator** — express disjunction in a custom `verify`.
