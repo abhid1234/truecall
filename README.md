@@ -4,7 +4,11 @@
 
 TrueCall is an open, cross-harness, runtime layer that verifies whether an AI agent's tool call *actually achieved its real-world intent* — not just whether it returned `success` or `200`. When a tool silently fails (returns success but the world didn't change), TrueCall catches it with a cheap **deterministic post-condition check** and hands the agent a structured correction signal so it can self-correct.
 
-> Status: early. The contract format ([`docs/spec.md`](docs/spec.md)) and the zero-dependency core runtime ([`packages/core`](packages/core)) are built and tested. Harness adapters and the end-to-end demo are next.
+### ▶ Try it in your browser → **[truecall-eosin.vercel.app](https://truecall-eosin.vercel.app)**
+
+An interactive playground: pick a scenario, flip *"silently failed,"* and watch the verifier catch it — no install. Runs the real verify engine against a simulated environment, in your browser.
+
+> Status: the contract format ([`docs/spec.md`](docs/spec.md)), the zero-dependency core runtime ([`packages/core`](packages/core)), and harness adapters for **Claude Code** and **Codex** over one shared verifier ([`packages/adapters`](packages/adapters)) are built and tested, with before/after demos ([`examples/silent-failure`](examples/silent-failure)) and the live playground above.
 
 ## The problem
 
@@ -95,8 +99,9 @@ npm test               # run the suite (tsx --test)
 - ✅ Confirm the gap is open ([`docs/gap-analysis.md`](docs/gap-analysis.md))
 - ✅ Contract format spec ([`docs/spec.md`](docs/spec.md))
 - ✅ Zero-dependency core runtime ([`packages/core`](packages/core))
-- ◻︎ Harness adapters (Claude Code first) + the before/after silent-failure demo
-- ◻︎ More built-in checks; contract generation from tool schemas
+- ✅ Harness adapters for Claude Code + Codex over one shared verifier ([`packages/adapters`](packages/adapters)) + before/after demos ([`examples/silent-failure`](examples/silent-failure))
+- ✅ Interactive playground ([truecall-eosin.vercel.app](https://truecall-eosin.vercel.app))
+- ◻︎ Publish `@truecall/core` to npm; more built-in checks; contract generation from tool schemas; more harness adapters as their hook APIs become public
 
 ## License
 
