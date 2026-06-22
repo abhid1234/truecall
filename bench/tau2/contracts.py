@@ -21,16 +21,16 @@ def _dump(db: Any) -> Any:
     return db
 
 
-def _orders(db: Any) -> dict:
-    o = getattr(db, "orders", None)
-    return o if isinstance(o, dict) else {}
-
-
-def _order_status(db: Any, order_id: str) -> Optional[str]:
-    order = _orders(db).get(order_id)
-    if order is None:
+def _status_in(db: Any, collection: str, item_id: Any) -> Optional[str]:
+    """Read db.<collection>[item_id].status for any domain (retail orders, airline
+    reservations, telecom lines, …). Returns None if the item is absent."""
+    coll = getattr(db, collection, None)
+    if not isinstance(coll, dict):
         return None
-    s = getattr(order, "status", None)
+    item = coll.get(item_id)
+    if item is None:
+        return None
+    s = getattr(item, "status", None)
     return str(s) if s is not None else None
 
 
@@ -43,23 +43,27 @@ def db_changed(tool: str) -> Contract:
     return Contract(tool=tool, describe="the write actually changed the database", check=check)
 
 
-# --- richer per-tool examples (retail) ---------------------------------------
-def _cancel_pending_order(ctx: Ctx) -> Optional[str]:
-    oid = ctx.args.get("order_id")
-    st = _order_status(ctx.after, oid)
-    if st is None:
-        return f"order {oid} not found after the call"
-    if st != "cancelled":
-        return f"order {oid} status is '{st}', expected 'cancelled'"
-    return None
+# --- richer per-tool examples (multi-domain) ---------------------------------
+def _cancelled(collection: str, id_arg: str):
+    """A check that the named item's status is 'cancelled' after the call."""
+    def check(ctx: Ctx) -> Optional[str]:
+        iid = ctx.args.get(id_arg)
+        st = _status_in(ctx.after, collection, iid)
+        if st is None:
+            return f"{collection[:-1]} {iid} not found after the call"
+        if st != "cancelled":
+            return f"{collection[:-1]} {iid} status is '{st}', expected 'cancelled'"
+        return None
+    return check
 
 
 SPECIFIC: dict[str, Contract] = {
-    "cancel_pending_order": Contract(
-        tool="cancel_pending_order",
-        describe="the order's status is 'cancelled'",
-        check=_cancel_pending_order,
-    ),
+    # retail
+    "cancel_pending_order": Contract("cancel_pending_order", "the order's status is 'cancelled'",
+                                     _cancelled("orders", "order_id")),
+    # airline
+    "cancel_reservation": Contract("cancel_reservation", "the reservation's status is 'cancelled'",
+                                   _cancelled("reservations", "reservation_id")),
 }
 
 
