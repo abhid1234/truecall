@@ -174,8 +174,11 @@ function renderDiff(verdict, world) {
   if (verdict.ok) {
     wi.append(el("div", "step", "3 · verified → passes through"));
     wi.append(el("div", "reality fixed", "reality: confirmed done"));
+  } else if (verdict.error) {
+    wi.append(el("div", "step", "3 · could not verify → flagged, not trusted"));
+    wi.append(el("div", "reality fixed", "reality: unverifiable result held back from the agent"));
   } else {
-    wi.append(el("div", "step", "3 · " + (verdict.error ? "could not verify → flagged" : "silent failure caught → correction sent")));
+    wi.append(el("div", "step", "3 · silent failure caught → correction sent"));
     wi.append(el("div", "step", "4 · agent self-corrects"));
     wi.append(el("div", "reality fixed", "reality: caught before it shipped"));
   }

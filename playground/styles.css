@@ -79,7 +79,6 @@ input:checked + .slider:before{transform:translateX(24px)}
 .stagerow .body{white-space:pre-wrap;word-break:break-word;color:#cfd2dc}
 .stagerow.good .glyph{color:var(--good)} .stagerow.bad .glyph{color:var(--bad)}
 .stagerow.verdict-bad .body{color:#ffd9d9} .stagerow.verdict-good .body{color:var(--good)}
-.console .k{color:#6ea8ff}
 /* JSON highlight (dark console) */
 .console .t-key{color:#6ea8ff}.console .t-str{color:#9ece6a}.console .t-num{color:#e0af68}.console .t-punct{color:#7c8190}.console .t-plain{color:#cfd2dc}
 
