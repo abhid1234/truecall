@@ -68,10 +68,26 @@ agent acting well on the signal.** TrueCall guarantees the first, not the second
 
 Do not quote run 2's +45% alone — it did not replicate.
 
+## Capability test: does a more capable agent recover better?
+
+The catch→recovery gap might just be the lightweight agent. Cheapest test within budget: re-run the iter2
+pair (p=0.4, seed 777) with the agent's **thinking enabled** (`reasoning_effort=low`) instead of disabled.
+
+| Condition | matched pairs | Baseline | TrueCall | Δ |
+|---|:---:|:---:|:---:|:---:|
+| thinking-disabled (iter2) | 28 | 0.321 | 0.500 | +0.179 |
+| thinking-low | 5 | 0.200 | 0.200 | +0.000 |
+
+On the matched tasks, enabling thinking did **not** improve recovery — Δreward was flat, same noisy regime.
+**Caveat: N=5 matched is tiny** (small run to fit the budget), so this is suggestive, not definitive. The
+honest read: a *modest* capability bump doesn't obviously convert catches into recoveries. The real test — a
+**frontier agent** (Gemini 2.5 Pro / Claude) — costs 10–20× and was out of budget here; it remains the open
+experiment. Grand-total spend across every run: **$2.45 of a $3.00 cap.**
+
 ## Future work to convert catches → completions
 
-- **A more capable agent** (or thinking enabled with a token budget that avoids the empty-message bug) —
-  the hypothesis is that a stronger agent uses the correction better. Untested here (cost/bug).
+- **A frontier agent** (Gemini 2.5 Pro / Claude). Thinking-*low* Flash was tested (above) and didn't help;
+  a genuinely stronger model is the untested hypothesis — it costs 10–20× and was out of this $3 budget.
 - **Better correction ergonomics** — the current signal is a tool-error string; a structured "retry this
   exact call" hint may reduce thrash.
 - **Larger N + matched-task analysis** (compare only tasks that completed in both arms; exclude infra 500s)
