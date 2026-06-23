@@ -22,7 +22,9 @@ A small reproducible benchmark ([`bench/`](bench)) of the mechanism — a *seede
 
 > **Without TrueCall: ~48% of tasks silently shipped broken. With TrueCall: 100% completed — every silent failure caught and corrected, 0 false positives.**
 
-`cd bench && tsx run.ts` to reproduce (same seed → same numbers). It's an honest test of the *mechanism* (deterministic catch + the [`verifyWithRetry`](packages/core/src/retry.ts) self-correction loop), not a claim about real agent task mixes — a live-agent τ-bench run is the natural next step.
+`cd bench && tsx run.ts` to reproduce (same seed → same numbers). It's an honest test of the *mechanism* (deterministic catch + the [`verifyWithRetry`](packages/core/src/retry.ts) self-correction loop), not a claim about real agent task mixes.
+
+**And on a real agent:** it's now been run live on [τ²-bench](bench/tau2) (Gemini 2.5 Flash, retail) — full data in [`bench/tau2/RESULTS.md`](bench/tau2/RESULTS.md). The deterministic claim held cleanly: **100% of injected silent failures caught, 0 false positives** across every run. Task-reward, though, was within noise — so I read the trajectories to find out why, and the answer was concrete: **after a catch, the agent retried the failed call only 8% of the time — it gave up 84%**, treating the correction as "report a failure" rather than "retry." Detection wasn't the bottleneck; the *wording of the correction* was. Rewording it as an imperative ("retry this exact call now; don't tell the user it failed") raised the retry rate to **64% (~8×)**. The honest frame: deterministic detection is the floor; getting the agent to act on it is an ergonomics problem — and a tractable one.
 
 ## The wedge
 
