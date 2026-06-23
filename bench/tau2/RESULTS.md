@@ -12,7 +12,8 @@ tau2-bench v1.0.0. Honest write-up — including what did **not** pan out.
   mutation skipped). Two **paired** arms on the same seed: *baseline* (faults, no correction) vs *TrueCall*
   (same faults, correction injected in-flight). Contracts are generic (`db_changed` + per-tool), never the
   per-task oracle.
-- Metric: τ²-bench reward (final DB-state match × communicate). ~$2.2 total spend.
+- Metric: τ²-bench reward (final DB-state match × communicate). **Total spend across all runs: $2.70 of a
+  $3.00 cap** (intermediate checkpoints noted below).
 
 ## Three paired runs
 
@@ -113,16 +114,16 @@ On the matched tasks, enabling thinking did **not** improve recovery — Δrewar
 **Caveat: N=5 matched is tiny** (small run to fit the budget), so this is suggestive, not definitive. The
 honest read: a *modest* capability bump doesn't obviously convert catches into recoveries. The real test — a
 **frontier agent** (Gemini 2.5 Pro / Claude) — costs 10–20× and was out of budget here; it remains the open
-experiment. Grand-total spend across every run: **$2.45 of a $3.00 cap.**
+experiment. (Spend at this checkpoint: $2.45; final total after the ergonomics validation: $2.70.)
 
 ## Future work to convert catches → completions
 
 - **A frontier agent** (Gemini 2.5 Pro / Claude). Thinking-*low* Flash was tested (above) and didn't help;
   a genuinely stronger model is the untested hypothesis — it costs 10–20× and was out of this $3 budget.
-- **Better correction ergonomics** — the current signal is a tool-error string; a structured "retry this
-  exact call" hint may reduce thrash.
-- **Larger N + matched-task analysis** (compare only tasks that completed in both arms; exclude infra 500s)
-  to measure the real effect with tighter error bars.
+- ✅ **Better correction ergonomics** — *done* (see above): the imperative rewrite took the retry rate
+  9% → 64%. Next: validate it lifts end-to-end *task reward*, not just retries, at larger N.
+- **Larger N + matched-task analysis** to measure the reward effect of the new message with tighter error
+  bars (this round established the retry-rate lever; the reward follow-through is the next measurement).
 - The premature-done gate experiment (`run.py --no-faults`) on unmodified τ²-bench.
 
 ## Reproduce
