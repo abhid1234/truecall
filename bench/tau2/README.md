@@ -44,9 +44,13 @@ the per-task `evaluation_criteria` / goal DB that τ²-bench scores against — 
 agent would be cheating and the result would be meaningless. The `db_changed` generic deliberately needs
 *zero* per-task knowledge.
 
-## Honest scope & how to report
+## Results
 
-A truthful headline reads like: *"On τ²-bench (retail) with WRITE-tool faults injected at p=0.3, TrueCall
-recovered N pass@1 points (X% → Y%) by catching every silent failure and prompting the agent to retry —
-0 false positives, over T trials, seed S."* Pin the tau2-bench commit (`cd .tau2 && git rev-parse HEAD`)
-and the models/seed. Cite τ-bench (arXiv 2406.12045) and τ²-bench (arXiv 2506.07982); τ²-bench is MIT.
+It's been run live (Gemini 2.5 Flash, retail) — see **[RESULTS.md](RESULTS.md)**. Summary: TrueCall caught
+**100% of injected silent failures with 0 false positives** across three paired runs, but the **task-reward
+effect was within noise** (mean 0.36 → 0.38; one run +45%, two flat/negative). Honest reading: *detection is
+deterministic and reliable; whether a catch becomes a task recovery depends on the agent acting on the
+correction* — not guaranteed on a lightweight model. Don't quote the +45% run alone; it didn't replicate.
+
+Pin the tau2-bench commit (`cd .tau2 && git rev-parse HEAD`) and the models/seed. Cite τ-bench (arXiv
+2406.12045) and τ²-bench (arXiv 2506.07982); τ²-bench is MIT.

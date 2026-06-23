@@ -22,7 +22,9 @@ A small reproducible benchmark ([`bench/`](bench)) of the mechanism — a *seede
 
 > **Without TrueCall: ~48% of tasks silently shipped broken. With TrueCall: 100% completed — every silent failure caught and corrected, 0 false positives.**
 
-`cd bench && tsx run.ts` to reproduce (same seed → same numbers). It's an honest test of the *mechanism* (deterministic catch + the [`verifyWithRetry`](packages/core/src/retry.ts) self-correction loop), not a claim about real agent task mixes — a live-agent τ-bench run is the natural next step.
+`cd bench && tsx run.ts` to reproduce (same seed → same numbers). It's an honest test of the *mechanism* (deterministic catch + the [`verifyWithRetry`](packages/core/src/retry.ts) self-correction loop), not a claim about real agent task mixes.
+
+**And on a real agent:** it's now been run live on [τ²-bench](bench/tau2) (Gemini 2.5 Flash, retail) — full data in [`bench/tau2/RESULTS.md`](bench/tau2/RESULTS.md). The deterministic claim held cleanly: **100% of injected silent failures caught, 0 false positives** across three paired runs. The *task-reward* effect, though, was within noise (mean 0.36 → 0.38; one run +45%, two flat) — honest takeaway: **detection is deterministic and reliable; converting a catch into a task recovery depends on the agent acting on the correction**, which isn't guaranteed on a lightweight model. That gap — catch → recovery — is the next problem to work, not a number to oversell.
 
 ## The wedge
 
