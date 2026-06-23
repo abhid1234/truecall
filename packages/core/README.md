@@ -12,7 +12,7 @@ Code, Codex), see the adapters in the [monorepo](https://github.com/abhid1234/tr
 ## Install
 
 ```bash
-npm install truecall
+npm install @avee1234/truecall
 ```
 
 Zero runtime dependencies. Ships compiled ESM + type declarations; runs on Node 18+.
@@ -22,7 +22,7 @@ Zero runtime dependencies. Ships compiled ESM + type declarations; runs on Node 
 Declare a **contract** — a cheap post-condition that confirms intent — and wrap your tool with it:
 
 ```ts
-import { contract, wrapTool } from "truecall";
+import { contract, wrapTool } from "@avee1234/truecall";
 
 const createFile = wrapTool(
   contract({
