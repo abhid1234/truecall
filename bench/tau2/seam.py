@@ -57,12 +57,13 @@ def install(write_tools: set[str], faults=None, correct: bool = True) -> Stats:
 
         resp = original(self, message)  # runs the tool; mutates toolkit.db; returns ToolMessage
 
-        if inject and before is not None:
+        undone = inject and before is not None
+        if undone:
             toolkit.db = copy.deepcopy(before)  # silently undo the mutation, keep the success-shaped resp
 
         if is_write:
             stats.write_calls += 1
-            if inject:
+            if undone:  # only count a fault we actually injected (db was present to undo)
                 stats.faults_injected += 1
 
         contract = contract_for(tool_name, is_write)

@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 # --- locating + loading saved tau2 results -----------------------------------
 def _find_results(name: str) -> Path | None:
     for base in (HERE, HERE / ".tau2", Path.cwd()):
-        hits = glob(str(base / "**" / "simulations" / name / "results.json"), recursive=True)
+        hits = sorted(glob(str(base / "**" / "simulations" / name / "results.json"), recursive=True))
         if hits:
             return Path(hits[0])
     return None
@@ -69,6 +69,8 @@ def mean_reward(sims: list[dict]):
 def matched_delta(base: list[dict], tc: list[dict]):
     B = {(s["task_id"], s["trial"]): s for s in base}
     T = {(s["task_id"], s["trial"]): s for s in tc}
+    if len(B) != len([1 for _ in base]) or len(T) != len([1 for _ in tc]):
+        print("[truecall] warning: duplicate (task_id,trial) in a results dir — using the last of each")
     keys = [k for k in B if k in T and _normal(B[k]) and _normal(T[k])]
     if not keys:
         return None
@@ -90,6 +92,7 @@ def retry_rate(sims: list[dict]):
             corrected = _tcname((prev.get("tool_calls") or [{}])[0]) if prev else None
             nxt = next((msgs[j] for j in range(i + 1, len(msgs)) if msgs[j].get("role") == "assistant"), None)
             if not nxt:
+                gave_up += 1  # told to retry but ended the conversation — the strongest give-up
                 continue
             ntools = [_tcname(tc) for tc in (nxt.get("tool_calls") or [])]
             if not ntools:

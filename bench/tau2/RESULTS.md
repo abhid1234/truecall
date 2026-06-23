@@ -64,8 +64,8 @@ agent acting well on the signal.** TrueCall guarantees the first, not the second
 
 > *Live on τ²-bench (retail) with a Gemini 2.5 Flash agent, TrueCall caught 100% of injected silent
 > tool-failures with 0 false positives. Net task-reward was within noise — because the agent retried the
-> caught call only 9% of the time (it gave up 82%). That's a correction-**ergonomics** problem, not a
-> detection or capability one: an imperative correction message lifted the retry rate to 64% (~7×, n=11). Detection
+> caught call only 8% of the time (it gave up 84%). That's a correction-**ergonomics** problem, not a
+> detection or capability one: an imperative correction message lifted the retry rate to 64% (~8×, n=11). Detection
 > is the deterministic floor; converting catches into recoveries is a tractable ergonomics problem.*
 
 Do not quote run 2's +45% alone — it did not replicate; the retry-rate finding is the durable result.
@@ -75,14 +75,14 @@ Do not quote run 2's +45% alone — it did not replicate; the retry-rate finding
 Reading the trajectories explained the catch→recovery gap. After a TrueCall correction, what did the agent
 actually do next?
 
-| Agent's next move after a correction | OLD message (n=22) |
+| Agent's next move after a correction | OLD message (n=25) |
 |---|:---:|
-| **retried the failed tool** (the only path to recovery) | **9%** |
-| called a different tool | 9% |
-| gave up — apologized to the user / moved on | **82%** |
+| **retried the failed tool** (the only path to recovery) | **8%** |
+| called a different tool | 8% |
+| gave up — apologized / moved on / ended the conversation | **84%** |
 
 The agent read the soft correction (*"…the effect was not confirmed; retry or verify before continuing"*)
-as **"report a failure to the user"** and gave up 82% of the time. Detection was never the problem — and
+as **"report a failure to the user"** and gave up 84% of the time. Detection was never the problem — and
 neither was model capability. The **wording of the correction** was.
 
 So I rewrote it as an imperative that names the tool and forbids giving up: *"NOT DONE: `tool` returned
@@ -91,11 +91,13 @@ Do NOT tell the user it failed and do NOT move on — retry this exact call."* R
 
 | Correction message | corrections | retried the failed tool | gave up |
 |---|:---:|:---:|:---:|
-| old (soft) | 22 | 9% | 82% |
+| old (soft) | 25 | 8% | 84% |
 | **new (imperative)** | 11 | **64%** | 36% |
 
-**Retry rate 9% → 64% (~7×) from a wording change** (`seam.py`) — and the estimate held as n grew (67% at
-n=6 → 64% at n=11 across two fault rates and two seeds). Caveat: n=11 is still modest and a retry is a
+**Retry rate 8% → 64% (~8×) from a wording change** (`seam.py`) — and the estimate held as n grew (67% at
+n=6 → 64% at n=11 across two fault rates and two seeds). (Give-up % counts both text-only replies and
+corrections where the agent *ended the conversation* — the strongest give-up; notably the imperative message
+produced none of the latter.) Caveat: n=11 is still modest and a retry is a
 *necessary* precondition for recovery, not a guarantee of it. But retry-rate is the leading indicator
 TrueCall directly controls, and this is the clearest lever found. The deterministic catch is the floor;
 getting the agent to *act* on it is an ergonomics problem, and a tractable one.
@@ -121,7 +123,7 @@ experiment. (Spend at this checkpoint: $2.45; final total after the ergonomics v
 - **A frontier agent** (Gemini 2.5 Pro / Claude). Thinking-*low* Flash was tested (above) and didn't help;
   a genuinely stronger model is the untested hypothesis — it costs 10–20× and was out of this $3 budget.
 - ✅ **Better correction ergonomics** — *done* (see above): the imperative rewrite took the retry rate
-  9% → 64%. Next: validate it lifts end-to-end *task reward*, not just retries, at larger N.
+  8% → 64%. Next: validate it lifts end-to-end *task reward*, not just retries, at larger N.
 - **Larger N + matched-task analysis** to measure the reward effect of the new message with tighter error
   bars (this round established the retry-rate lever; the reward follow-through is the next measurement).
 - The premature-done gate experiment (`run.py --no-faults`) on unmodified τ²-bench.
