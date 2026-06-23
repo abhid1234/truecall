@@ -8,7 +8,7 @@ TrueCall is an open, cross-harness, runtime layer that verifies whether an AI ag
 
 An interactive playground: pick a scenario, flip *"silently failed,"* and watch the verifier catch it — no install. Runs the real verify engine against a simulated environment, in your browser.
 
-> Status: the contract format ([`docs/spec.md`](docs/spec.md)), the zero-dependency core runtime ([`packages/core`](packages/core)), and harness adapters for **Claude Code** and **Codex** over one shared verifier ([`packages/adapters`](packages/adapters)) are built and tested, with before/after demos ([`examples/silent-failure`](examples/silent-failure)) and the live playground above.
+> Status: **on npm** — `npm install @avee1234/truecall`. The zero-dependency core ([`packages/core`](packages/core)), the contract format ([`docs/spec.md`](docs/spec.md)), harness adapters for **Claude Code** and **Codex** over one shared verifier ([`packages/adapters`](packages/adapters)), before/after demos ([`examples/silent-failure`](examples/silent-failure)), and the live playground above are built and tested. It's also been **run live on τ²-bench** ([`bench/tau2/RESULTS.md`](bench/tau2/RESULTS.md)): 100% of injected silent failures caught, 0 false positives — and the trajectories revealed (then fixed) *why* agents ignore corrections.
 
 ## The problem
 
