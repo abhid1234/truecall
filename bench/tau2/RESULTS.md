@@ -26,6 +26,22 @@ tau2-bench v1.0.0. Honest write-up — including what did **not** pan out.
 Across all six arms, **TrueCall produced 0 false positives** and **caught every injected silent failure**
 that returned a success-shaped result (~225 catches; the TrueCall arms corrected 142 of them in-flight).
 
+### Matched-task analysis (controls for transient API failures)
+
+The raw table averages over whichever conversations completed — but transient Gemini 500s failed *different*
+tasks in each arm, adding noise. Re-computing on only the (task, trial) pairs that **terminated normally in
+both arms** (apples-to-apples) sharpens the picture:
+
+| Run | matched pairs | Baseline | TrueCall | Δ |
+|----:|:-------------:|:--------:|:--------:|:-----:|
+| iter1 (p=0.3) | 16 | 0.375 | 0.375 | +0.000 |
+| iter2 (p=0.4) | 28 | 0.321 | 0.500 | +0.179 |
+| iter3 (p=0.4) | 29 | 0.448 | 0.345 | −0.103 |
+
+The swing (0.0 / +0.18 / −0.10) **survives** the matched comparison — so the inconsistency is **real agent
+behavior under correction**, not just infra noise. That makes the "recovery is not guaranteed" conclusion
+more robust, not less. Exact total spend across all runs (summed `agent_cost + user_cost`): **$2.11**.
+
 ## What this shows — and what it doesn't
 
 **Detection is rock-solid (the core claim holds).** Deterministic post-conditions caught 100% of injected
