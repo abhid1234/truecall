@@ -17,15 +17,23 @@ TrueCall on the *same* tasks and the *same* fault seed.
 | `setup.sh` | clone + install tau2-bench into a gitignored `.tau2/` | needs network |
 
 ```bash
-# key-free: verify the engine, contracts, and fault injector
-python3 -m unittest discover -s tests -v      # 7 tests, no deps, no key
+# key-free: verify the engine, contracts, fault injector + the live seam (if tau2 installed)
+python3 -m unittest discover -s tests -v      # 11 tests, no key
 
 # the live eval (needs tau2 + an API key + a few $)
 ./setup.sh
 source .tau2/.venv/bin/activate
 export OPENAI_API_KEY=sk-...
 python3 run.py --domain retail --model gpt-4o-mini --tasks 5 --trials 2 --fault-p 0.3   # ~$0.05–0.20
+
+# Gemini 2.5 needs --reasoning-effort disable (thinking mode otherwise emits empty messages):
+export GEMINI_API_KEY=...
+python3 run.py --model gemini/gemini-2.5-flash --reasoning-effort disable --tasks 5 --trials 2 --fault-p 0.4
 ```
+
+`run.py` runs both arms and prints: mean reward, the **matched Δreward** (only tasks completed in both arms),
+the seam stats (catches / corrections / false positives), the **retry rate** (after a correction, how often
+the agent re-calls the failed tool — the key recovery indicator), and the spend.
 
 ## Two experiments
 

@@ -34,6 +34,11 @@ class TestSeamLive(unittest.TestCase):
             # the fault undid the mutation -> contract catches it -> correction injected
             self.assertTrue(resp.error)
             self.assertIn("[TrueCall]", resp.content)
+            # ergonomics: the correction must be an IMPERATIVE to retry (trajectory analysis
+            # showed soft phrasing made agents give up 82% of the time). Regression guard.
+            self.assertIn("ACTION REQUIRED", resp.content)
+            self.assertIn("cancel_pending_order", resp.content)  # names the tool to re-call
+            self.assertIn("Do NOT tell the user", resp.content)
             self.assertEqual(str(env.tools.db.orders[oid].status), "pending")  # mutation was undone
             self.assertGreaterEqual(stats.faults_injected, 1)
             self.assertGreaterEqual(stats.caught, 1)
