@@ -64,7 +64,7 @@ agent acting well on the signal.** TrueCall guarantees the first, not the second
 > *Live on τ²-bench (retail) with a Gemini 2.5 Flash agent, TrueCall caught 100% of injected silent
 > tool-failures with 0 false positives. Net task-reward was within noise — because the agent retried the
 > caught call only 9% of the time (it gave up 82%). That's a correction-**ergonomics** problem, not a
-> detection or capability one: an imperative correction message lifted the retry rate to 67% (~7×). Detection
+> detection or capability one: an imperative correction message lifted the retry rate to 64% (~7×, n=11). Detection
 > is the deterministic floor; converting catches into recoveries is a tractable ergonomics problem.*
 
 Do not quote run 2's +45% alone — it did not replicate; the retry-rate finding is the durable result.
@@ -91,13 +91,13 @@ Do NOT tell the user it failed and do NOT move on — retry this exact call."* R
 | Correction message | corrections | retried the failed tool | gave up |
 |---|:---:|:---:|:---:|
 | old (soft) | 22 | 9% | 82% |
-| **new (imperative)** | 6 | **67%** | 33% |
+| **new (imperative)** | 11 | **64%** | 36% |
 
-**Retry rate 9% → 67% (~7×) from a wording change** (`seam.py`). Caveat: n=6 for the new message is small —
-a strong directional signal, not a tight estimate — and a retry is a *necessary* precondition for recovery,
-not a guarantee of it. But retry-rate is the leading indicator TrueCall directly controls, and this is the
-clearest lever found. The deterministic catch is the floor; getting the agent to *act* on it is an
-ergonomics problem, and a tractable one.
+**Retry rate 9% → 64% (~7×) from a wording change** (`seam.py`) — and the estimate held as n grew (67% at
+n=6 → 64% at n=11 across two fault rates and two seeds). Caveat: n=11 is still modest and a retry is a
+*necessary* precondition for recovery, not a guarantee of it. But retry-rate is the leading indicator
+TrueCall directly controls, and this is the clearest lever found. The deterministic catch is the floor;
+getting the agent to *act* on it is an ergonomics problem, and a tractable one.
 
 ## Capability test: does a more capable agent recover better?
 
