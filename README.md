@@ -45,7 +45,7 @@ It is **not** confidence scoring, **not** an offline eval, **not** a pre-executi
 You declare a **contract** for a tool: a cheap post-condition that confirms intent. After the tool runs, TrueCall evaluates it. Pass → the result flows through untouched. Fail → the agent gets a structured signal describing what was expected, what was actually found, and how to fix it.
 
 ```ts
-import { contract, wrapTool } from "truecall";
+import { contract, wrapTool } from "@avee1234/truecall";
 
 // "After create_file succeeds, a non-empty file must exist at the path."
 const createFile = wrapTool(
@@ -114,7 +114,7 @@ npm test               # run the suite (tsx --test)
 - ✅ Zero-dependency core runtime ([`packages/core`](packages/core))
 - ✅ Harness adapters for Claude Code + Codex over one shared verifier ([`packages/adapters`](packages/adapters)) + before/after demos ([`examples/silent-failure`](examples/silent-failure))
 - ✅ Interactive playground ([truecall-eosin.vercel.app](https://truecall-eosin.vercel.app))
-- ✅ Published to npm: **`npm install truecall`** ([npmjs.com/package/truecall](https://www.npmjs.com/package/truecall))
+- ✅ Published to npm: **`npm install @avee1234/truecall`** ([npmjs.com/package/@avee1234/truecall](https://www.npmjs.com/package/@avee1234/truecall))
 - ◻︎ More built-in checks; contract generation from tool schemas; more harness adapters as their hook APIs become public; a live-agent τ²-bench run
 
 ## License

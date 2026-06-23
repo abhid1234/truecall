@@ -24,6 +24,9 @@ test("returns block JSON when the post-condition fails", async () => {
   assert.equal(parsed.hookSpecificOutput.hookEventName, "PostToolUse");
   assert.match(parsed.reason, /post-condition failed/);
   assert.match(parsed.hookSpecificOutput.additionalContext, /Expected:/);
+  // imperative correction (τ²-bench finding: soft phrasing -> agents give up; see bench/tau2/RESULTS.md)
+  assert.match(parsed.hookSpecificOutput.additionalContext, /ACTION REQUIRED: re-run/);
+  assert.match(parsed.hookSpecificOutput.additionalContext, /Do NOT report success/);
 });
 
 test("returns null when no binding matches the tool name", async () => {

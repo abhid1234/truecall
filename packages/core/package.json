@@ -1,5 +1,5 @@
 {
-  "name": "truecall",
+  "name": "@avee1234/truecall",
   "version": "0.1.0",
   "description": "Deterministic runtime post-condition verification for AI agent tool calls.",
   "license": "MIT",
