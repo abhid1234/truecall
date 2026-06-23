@@ -62,11 +62,42 @@ agent acting well on the signal.** TrueCall guarantees the first, not the second
 ## Honest headline
 
 > *Live on τ²-bench (retail) with a Gemini 2.5 Flash agent, TrueCall caught 100% of injected silent
-> tool-failures with 0 false positives. Net task-reward change was within noise (mean 0.36 → 0.38 over three
-> paired runs, swing −6% to +45%) — on a lightweight agent, reliable **recovery** from a caught failure is
-> not guaranteed and is the open problem.*
+> tool-failures with 0 false positives. Net task-reward was within noise — because the agent retried the
+> caught call only 9% of the time (it gave up 82%). That's a correction-**ergonomics** problem, not a
+> detection or capability one: an imperative correction message lifted the retry rate to 67% (~7×). Detection
+> is the deterministic floor; converting catches into recoveries is a tractable ergonomics problem.*
 
-Do not quote run 2's +45% alone — it did not replicate.
+Do not quote run 2's +45% alone — it did not replicate; the retry-rate finding is the durable result.
+
+## The real bottleneck: correction *ergonomics* (and a fix)
+
+Reading the trajectories explained the catch→recovery gap. After a TrueCall correction, what did the agent
+actually do next?
+
+| Agent's next move after a correction | OLD message (n=22) |
+|---|:---:|
+| **retried the failed tool** (the only path to recovery) | **9%** |
+| called a different tool | 9% |
+| gave up — apologized to the user / moved on | **82%** |
+
+The agent read the soft correction (*"…the effect was not confirmed; retry or verify before continuing"*)
+as **"report a failure to the user"** and gave up 82% of the time. Detection was never the problem — and
+neither was model capability. The **wording of the correction** was.
+
+So I rewrote it as an imperative that names the tool and forbids giving up: *"NOT DONE: `tool` returned
+success but the change did NOT take effect. ACTION REQUIRED: call `tool` again now with the same arguments.
+Do NOT tell the user it failed and do NOT move on — retry this exact call."* Re-measured:
+
+| Correction message | corrections | retried the failed tool | gave up |
+|---|:---:|:---:|:---:|
+| old (soft) | 22 | 9% | 82% |
+| **new (imperative)** | 6 | **67%** | 33% |
+
+**Retry rate 9% → 67% (~7×) from a wording change** (`seam.py`). Caveat: n=6 for the new message is small —
+a strong directional signal, not a tight estimate — and a retry is a *necessary* precondition for recovery,
+not a guarantee of it. But retry-rate is the leading indicator TrueCall directly controls, and this is the
+clearest lever found. The deterministic catch is the floor; getting the agent to *act* on it is an
+ergonomics problem, and a tractable one.
 
 ## Capability test: does a more capable agent recover better?
 
