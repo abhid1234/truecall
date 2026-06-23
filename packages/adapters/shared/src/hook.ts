@@ -30,14 +30,19 @@ export async function handleHookEvent(input: HookInput, bindings: Binding[]): Pr
 function blockOutput(v: Extract<VerifyResult, { ok: false }>): unknown {
   const remediation = v.remediation ? ` Try: ${v.remediation}` : "";
   const kind = v.error ? "could not be verified" : "failed its post-condition";
+  // Imperative phrasing — a τ²-bench live run (bench/tau2/RESULTS.md) found agents read a soft
+  // "correct it before continuing" as "report a failure" and gave up ~84% of the time; an explicit
+  // "re-run it now; don't report success" instruction took the retry rate 8% → 64%.
+  const action = v.error
+    ? `ACTION REQUIRED: do NOT assume \`${v.tool}\` succeeded — re-run or verify it before continuing.`
+    : `ACTION REQUIRED: re-run \`${v.tool}\` now to actually complete it. Do NOT report success and do NOT move on until the effect is confirmed.`;
   return {
     decision: "block",
     reason: v.message,
     hookSpecificOutput: {
       hookEventName: "PostToolUse",
       additionalContext:
-        `TrueCall: \`${v.tool}\` ${kind}. Expected: ${v.expected}. Actual: ${v.actual}.${remediation} ` +
-        `The tool reported success but the intended effect was not confirmed — correct it before continuing.`,
+        `TrueCall: \`${v.tool}\` ${kind}. Expected: ${v.expected}. Actual: ${v.actual}.${remediation} ${action}`,
     },
   };
 }
