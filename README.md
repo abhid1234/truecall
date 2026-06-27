@@ -87,14 +87,27 @@ See [`docs/spec.md`](docs/spec.md) for the full contract format.
 - **Deterministic first.** Real post-condition checks, not confidence scoring.
 - **Pro-ecosystem.** TrueCall makes agents on every platform more reliable. It is not framed against any vendor.
 
+## Notes from building it
+
+A few things this project taught me:
+
+- **Prove the gap before you build.** A day of adversarial research — does an open, deterministic, cross-harness runtime verifier already exist? — saved weeks. (One research pass confidently told me a real paper didn't exist; it did. Verify before you commit.)
+- **Constraints make better software.** Built on a machine with no external npm — which is exactly *why* the core ended up zero-dependency. A layer you put in front of your agent shouldn't drag a dependency tree behind it.
+- **"Cross-harness" has to be load-bearing, not a slogan.** I refactored until the entire runtime difference between the Claude Code and Codex adapters was one line — `input.tool_output ?? input.tool_response`. Same contract, two agents.
+- **Ship an honest "not yet."** No public post-tool hook API exists for a third harness today, so that adapter is a documented stub — not a fake "yes."
+- **Detection is the floor; correction *ergonomics* is the lever.** On a live τ²-bench run, TrueCall caught 100% of injected silent failures (0 false positives) — but the agent acted on the correction only **8%** of the time until I reworded it from a polite "verify before continuing" into a blunt imperative, which took retries to **64%**. The deterministic catch tells you the world didn't change; getting the agent to *fix* it is a wording problem. Full data + caveats in [`bench/tau2/RESULTS.md`](bench/tau2/RESULTS.md).
+
 ## Repository
 
 ```
-docs/
-  gap-analysis.md   # the competitive map: why this niche is open
-  spec.md           # the contract / post-condition format (v1)
+docs/              # gap analysis, the contract spec, design + scoping notes
 packages/
-  core/             # zero-dependency runtime: contracts, checks, verify, wrapTool
+  core/            # zero-dependency runtime: contracts, checks, verify, wrapTool, recipes, verifyWithRetry
+  adapters/        # one shared verifier + thin Claude Code & Codex hooks (Antigravity stubbed honestly)
+examples/
+  silent-failure/  # the before/after demo
+bench/             # reproducible mechanism benchmark + a live τ²-bench integration (bench/tau2)
+playground/        # the static browser playground (deployed to Vercel)
 ```
 
 ### Build & test the core
@@ -115,7 +128,8 @@ npm test               # run the suite (tsx --test)
 - ✅ Harness adapters for Claude Code + Codex over one shared verifier ([`packages/adapters`](packages/adapters)) + before/after demos ([`examples/silent-failure`](examples/silent-failure))
 - ✅ Interactive playground ([truecall-eosin.vercel.app](https://truecall-eosin.vercel.app))
 - ✅ Published to npm: **`npm install @avee1234/truecall`** ([npmjs.com/package/@avee1234/truecall](https://www.npmjs.com/package/@avee1234/truecall))
-- ◻︎ More built-in checks; contract generation from tool schemas; more harness adapters as their hook APIs become public; a live-agent τ²-bench run
+- ✅ Live-agent τ²-bench integration + results ([`bench/tau2/RESULTS.md`](bench/tau2/RESULTS.md))
+- ◻︎ More built-in checks; contract generation from tool schemas; more harness adapters as their hook APIs become public; measuring whether the imperative correction lifts end-to-end task reward at larger N (and a frontier-agent run)
 
 ## License
 
